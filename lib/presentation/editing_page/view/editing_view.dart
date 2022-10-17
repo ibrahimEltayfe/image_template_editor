@@ -67,9 +67,11 @@ class _EditingPageState extends State<EditingPage> {
                         editingViewModel:editingViewModel
                       ),
 
-                      BottomToolBar(
-                          height: actualScreenHeight * 0.2,
-                          editingViewModel: editingViewModel
+                      Expanded(
+                        child: BottomToolBar(
+                            height: actualScreenHeight * 0.2,
+                            editingViewModel: editingViewModel
+                        ),
                       )
                     ],
                   ),

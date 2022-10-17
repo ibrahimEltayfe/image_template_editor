@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_manipulate/core/constants/app_colors.dart';
@@ -146,28 +147,43 @@ class _ItemsControlSectionState extends State<_ItemsControlSection> {
                     child: Row(
                       children: [
                         Expanded(
-                          child: ListView.separated(
-                              controller: scrollController,
+                          child: ReorderableListView.builder(
+                            header: null,
+                              onReorder: (oldIndex, newIndex) {
+                                if (newIndex > oldIndex) {
+                                  newIndex -= 1;
+                                }
+                                final item = editingViewModel.imageList.removeAt(oldIndex);
+                                editingViewModel.imageList.insert(newIndex,item);
+                                editingViewModel.changeSelectedImageIndex(newIndex);
+                              },
+                              onReorderEnd: (index) {
+
+                              },
+                              scrollController: scrollController,
                               padding: EdgeInsets.symmetric(vertical:widget.height*0.09 ),
                               scrollDirection: Axis.horizontal,
-                              itemCount: images.length,
-                              separatorBuilder: (context, index) => SizedBox(width: context.width*0.02,),//todo:width..
+                              itemCount: editingViewModel.imageList.length,
                               itemBuilder:(context, index) {
                                 return GestureDetector(
+                                  key: ValueKey(editingViewModel.imageList[index]),
                                   onTap: (){
                                     editingViewModel.changeSelectedImageIndex(index);
                                   },
-                                  child: Container(
-                                    width: context.width*0.192,
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(15),
-                                        border: editingViewModel.selectedImageIndex == index
-                                            ?Border.all(color: AppColors.primaryColor,width: 2)
-                                            :null
-                                    ),
-                                    child: ClipRRect(
-                                        borderRadius:BorderRadius.circular(15) ,
-                                        child: Image.file(File(images[index].imageFile.path),fit: BoxFit.fill,)
+                                  child: Padding(
+                                    padding: EdgeInsets.only(right: context.width*0.02),
+                                    child: Container(
+                                      width: context.width*0.19,
+                                      decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(15),
+                                          border: editingViewModel.selectedImageIndex == index
+                                              ?Border.all(color: AppColors.primaryColor,width: 2)
+                                              :null
+                                      ),
+                                      child: ClipRRect(
+                                          borderRadius:BorderRadius.circular(15) ,
+                                          child: Image.file(File(images[index].imageFile.path),fit: BoxFit.fill,)
+                                      ),
                                     ),
                                   ),
                                 );

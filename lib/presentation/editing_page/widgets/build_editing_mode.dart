@@ -46,6 +46,7 @@ class _GetAttributesButtons extends StatelessWidget {
             }
 
             return ListView.builder(
+
                 scrollDirection: Axis.horizontal,
                 itemCount: subButtons.length,
                 itemBuilder:(context, i) {
@@ -53,7 +54,7 @@ class _GetAttributesButtons extends StatelessWidget {
                   return Padding(
                     padding: EdgeInsets.symmetric(vertical: p1.maxHeight*0.075),
                     child: SizedBox(
-                      width: p1.maxWidth*0.24,
+                      width: p1.maxWidth*0.22,
                       child: Column(
                         children: [
                           SizedBox(
