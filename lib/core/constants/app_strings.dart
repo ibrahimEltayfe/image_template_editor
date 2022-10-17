@@ -8,10 +8,9 @@ class AppStrings {
   static const String resize = 'Resize';
   static const String removeBg = 'Remove BG';
   static const String blackAndWhite = "B&W";
-  static const String changeImage = 'Change Image';
+  static const String changeImage = 'Change';
 
   static const String text = 'Text';
-  static const String changeText = 'Change Text';
   static const String addText = 'Add Text';
   static const String textSize ='Size';
   static const String fontFamily = 'Font Family';

@@ -173,7 +173,7 @@ class _ItemsControlSectionState extends State<_ItemsControlSection> {
                                   child: Padding(
                                     padding: EdgeInsets.only(right: context.width*0.02),
                                     child: Container(
-                                      width: context.width*0.19,
+                                      width: context.width*0.18,
                                       decoration: BoxDecoration(
                                           borderRadius: BorderRadius.circular(15),
                                           border: editingViewModel.selectedImageIndex == index

@@ -13,6 +13,7 @@ class AppIcons{
   static const IconData save = FontAwesomeIcons.floppyDisk;
   static const IconData delete = FontAwesomeIcons.trash;
 
+  static const IconData changeImage = FontAwesomeIcons.repeat;
   static const IconData resize = FontAwesomeIcons.expand;
   static const IconData crop = FontAwesomeIcons.cropSimple;
   static const IconData blackAndWhite = FontAwesomeIcons.circleHalfStroke;

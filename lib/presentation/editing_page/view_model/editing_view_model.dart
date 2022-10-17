@@ -94,9 +94,9 @@ class EditingViewModel extends BaseViewModel with EditingInputViewModel,EditingO
       mainButtonsInput.add(_getMainButtons(type));
 
       attributeButtonsInput.add(_getAttributeButtons());
-   }
+    }
   }
-  
+
   void changeAttributeButtons(AttributeButtonType type){
     if(type != attributeButtonType){
       attributeButtonsInput.add(_getAttributeButtons(type:type));
@@ -114,34 +114,34 @@ class EditingViewModel extends BaseViewModel with EditingInputViewModel,EditingO
     TextStyle textStyle;
     ButtonStyle buttonStyle;
 
-     return List.generate(
-         MainButtonsType.values.length,
-         (i){
-           final buttonType = MainButtonsType.values[i];
+    return List.generate(
+        MainButtonsType.values.length,
+            (i){
+          final buttonType = MainButtonsType.values[i];
 
-           if(type == buttonType){
-             textStyle = getRegularTextStyle(color: AppColors.white);
-             buttonStyle = getRegularButtonStyle(bgColor: AppColors.primaryColor,radius: 25);
-           }else{
-             textStyle = getRegularTextStyle(color: AppColors.grey);
-             buttonStyle = getRegularButtonStyle(bgColor: AppColors.white, radius: 25);
-           }
-           return MainButtonModel(
-             title: _getMainButtonText(buttonType),
-             type: buttonType,
-             textStyle: textStyle,
-             buttonStyle: buttonStyle
-           );
-         }
-     );
-   }
+          if(type == buttonType){
+            textStyle = getRegularTextStyle(color: AppColors.white);
+            buttonStyle = getRegularButtonStyle(bgColor: AppColors.primaryColor,radius: 25);
+          }else{
+            textStyle = getRegularTextStyle(color: AppColors.grey);
+            buttonStyle = getRegularButtonStyle(bgColor: AppColors.white, radius: 25);
+          }
+          return MainButtonModel(
+              title: _getMainButtonText(buttonType),
+              type: buttonType,
+              textStyle: textStyle,
+              buttonStyle: buttonStyle
+          );
+        }
+    );
+  }
 
-   String _getMainButtonText(MainButtonsType type){
+  String _getMainButtonText(MainButtonsType type){
     switch(type){
       case MainButtonsType.image: return AppStrings.image;
       case MainButtonsType.text: return AppStrings.text;
     }
-   }
+  }
 
   List<AttributeButtonModel> _getAttributeButtons({AttributeButtonType? type}){
     TextStyle textStyle;
@@ -155,25 +155,25 @@ class EditingViewModel extends BaseViewModel with EditingInputViewModel,EditingO
     return List.generate(
         types.length, (i){
 
-          if(type == types[i]){
-            textStyle = getRegularTextStyle(color: AppColors.black);
-            buttonStyle = getRegularSubButtonStyle(bgColor: AppColors.primaryColor);
-            iconColor = AppColors.white;
-          }else{
-            textStyle = getRegularTextStyle(color: AppColors.grey);
-            buttonStyle = getRegularSubButtonStyle(bgColor: AppColors.lightGrey);
-            iconColor = AppColors.grey;
-          }
-          return AttributeButtonModel(
-              title: _getAttributeButtonText(types[i]),
-              textStyle: textStyle,
-              buttonStyle: buttonStyle,
-              iconColor: iconColor,
-              type: types[i],
-              icon: _getAttributeButtonIcon(types[i]),
+      if(type == types[i]){
+        textStyle = getRegularTextStyle(color: AppColors.black);
+        buttonStyle = getRegularSubButtonStyle(bgColor: AppColors.primaryColor);
+        iconColor = AppColors.white;
+      }else{
+        textStyle = getRegularTextStyle(color: AppColors.grey);
+        buttonStyle = getRegularSubButtonStyle(bgColor: AppColors.lightGrey);
+        iconColor = AppColors.grey;
+      }
+      return AttributeButtonModel(
+        title: _getAttributeButtonText(types[i]),
+        textStyle: textStyle,
+        buttonStyle: buttonStyle,
+        iconColor: iconColor,
+        type: types[i],
+        icon: _getAttributeButtonIcon(types[i]),
 
-          );
-        }
+      );
+    }
     );
   }
 
@@ -204,6 +204,7 @@ class EditingViewModel extends BaseViewModel with EditingInputViewModel,EditingO
       case AttributeButtonType.fontFamily: return AppStrings.fontFamily;
       case AttributeButtonType.fontWeight: return AppStrings.fontWeight;
       case AttributeButtonType.textColor: return AppStrings.textColor;
+
       case AttributeButtonType.resize: return AppStrings.resize;
       case AttributeButtonType.crop: return AppStrings.crop;
       case AttributeButtonType.blackAndWhite: return AppStrings.blackAndWhite;
@@ -217,6 +218,7 @@ class EditingViewModel extends BaseViewModel with EditingInputViewModel,EditingO
       case AttributeButtonType.fontFamily: return AppIcons.fontFamily;
       case AttributeButtonType.fontWeight: return AppIcons.bold;
       case AttributeButtonType.textColor: return AppIcons.fontColor;
+
       case AttributeButtonType.resize: return AppIcons.resize;
       case AttributeButtonType.crop: return AppIcons.crop;
       case AttributeButtonType.blackAndWhite: return AppIcons.blackAndWhite;
@@ -302,7 +304,7 @@ class AddSectionModel{
   final List<String> titles;
   AddSectionModel({
     required this.titles,
-   });
+  });
 }
 
 class ImageModel{
@@ -338,7 +340,7 @@ class ImageModel{
 }
 
 enum MainButtonsType{
- image,text
+  image,text
 }
 
 enum AttributeButtonType{

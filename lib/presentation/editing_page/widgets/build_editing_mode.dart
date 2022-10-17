@@ -1,7 +1,11 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:image_manipulate/core/constants/app_icons.dart';
+import 'package:image_manipulate/core/constants/app_strings.dart';
 import 'package:image_manipulate/core/extensions/size_config.dart';
 import 'package:image_manipulate/presentation/editing_page/view_model/editing_view_model.dart';
+import 'package:image_manipulate/presentation/reusable_components/fitted_icon.dart';
 import 'package:image_manipulate/presentation/reusable_components/fittted_text.dart';
 import '../../../core/constants/app_colors.dart';
 
@@ -46,11 +50,9 @@ class _GetAttributesButtons extends StatelessWidget {
             }
 
             return ListView.builder(
-
                 scrollDirection: Axis.horizontal,
                 itemCount: subButtons.length,
-                itemBuilder:(context, i) {
-
+                itemBuilder:(context, i){
                   return Padding(
                     padding: EdgeInsets.symmetric(vertical: p1.maxHeight*0.075),
                     child: SizedBox(
@@ -66,18 +68,18 @@ class _GetAttributesButtons extends StatelessWidget {
                                   editingViewModel.changeAttributeButtons(subButtons[i].type);
                                 },
                                 child:LayoutBuilder(
-                                  builder: (_,constraints) {
-                                    return SizedBox(
-                                      height: constraints.maxHeight*0.52,
-                                      width: constraints.maxWidth*0.52,
-                                      child: FittedBox(
-                                        child: Icon(
-                                            subButtons[i].icon,
-                                            color: subButtons[i].iconColor
+                                    builder: (_,constraints) {
+                                      return SizedBox(
+                                        height: constraints.maxHeight*0.52,
+                                        width: constraints.maxWidth*0.52,
+                                        child: FittedBox(
+                                          child: Icon(
+                                              subButtons[i].icon,
+                                              color: subButtons[i].iconColor
+                                          ),
                                         ),
-                                      ),
-                                    );
-                                  }
+                                      );
+                                    }
                                 )
                             ),
                           ),

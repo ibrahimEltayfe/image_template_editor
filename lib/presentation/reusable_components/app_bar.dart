@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:image_manipulate/core/constants/app_styles.dart';
 import 'package:image_manipulate/core/extensions/size_config.dart';
+import 'package:image_manipulate/presentation/editing_page/view_model/editing_view_model.dart';
 
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_icons.dart';
 import 'fitted_icon.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget{
-  final VoidCallback leftUndoTapAction;
-  final VoidCallback rightUndoTapAction;
-  final VoidCallback saveTapAction;
-  const CustomAppBar({Key? key, required this.leftUndoTapAction, required this.rightUndoTapAction, required this.saveTapAction}) : super(key: key);
+  final EditingViewModel editingViewModel;
+  const CustomAppBar({Key? key, required this.editingViewModel}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +18,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget{
       elevation: 0,
       automaticallyImplyLeading: false,
 
-      leading: const Icon(AppIcons.menu,color: AppColors.black87,size: kToolbarHeight * 0.5,),
+      leading: _BuildMenuButton(editingViewModel),
       actions: [
         _BuildUndoButtons(
           leftUndoTapAction:() {},
@@ -137,4 +137,49 @@ class _BuildSaveButton extends StatelessWidget {
   }
 }
 
+class _BuildMenuButton extends StatelessWidget {
+  final EditingViewModel editingViewModel;
+  _BuildMenuButton(this.editingViewModel,{Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () async {
+        await showMenu(
+          context: context,
+          position: const RelativeRect.fromLTRB(40, 40, 40, 40),
+          items: List.generate(
+              MenuActions.values.length, (i) {
+               return PopupMenuItem<String>(
+                 textStyle: getBoldTextStyle(color: MenuActions.values[i] == MenuActions.close ? AppColors.red : AppColors.black),
+                 onTap: (){
+
+                 },
+                 child: Text(MenuActions.values[i].getText()),
+               );
+           }),
+          elevation: 8.0,
+        );
+      },
+      child: const Icon(AppIcons.menu,color: AppColors.black87,size:  kToolbarHeight * 0.5,),
+    );
+  }
+}
+
+enum MenuActions{
+  newProject,
+  openProject,
+  close
+}
+
+extension menuActions on MenuActions{
+  String getText(){
+    switch(this) {
+      case MenuActions.newProject: return "New Project";
+      case MenuActions.openProject: return "Open Project";
+      case MenuActions.close: return "Close Project";
+    }
+  }
+
+}
 

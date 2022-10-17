@@ -42,11 +42,7 @@ class _EditingPageState extends State<EditingPage> {
     final actualScreenHeight = context.height - context.topPadding - kToolbarHeight - context.bottomPadding;
 
     return Scaffold(
-      appBar: CustomAppBar(
-        saveTapAction: (){},
-        leftUndoTapAction:(){},
-        rightUndoTapAction: (){},
-      ),
+      appBar: CustomAppBar(editingViewModel: editingViewModel,),
 
       body: SafeArea(
           child: SingleChildScrollView(
@@ -110,12 +106,36 @@ class _EditingSpace extends StatelessWidget {
                   editingViewModel.imageList[index].width = context.width * 0.95;
                   editingViewModel.imageList[index].height = height * 0.97;
                 }
-                return ResizableWidget(
-                  isResizable:index == editingViewModel.selectedImageIndex,
-                  editingViewModel: editingViewModel,
-                  index: index,
-                  ballDiameter: context.width *0.05,
-                  child: Image.file(File(list[index].imageFile.path),fit: BoxFit.fill,),
+                //todo:show the menu on correct location,refactor
+                return GestureDetector(
+                  onLongPress: () async{
+                    await showMenu(
+                      context: context,
+                      position: const RelativeRect.fromLTRB(150, 300, 150, 150),
+                      items: List.generate(ImageDropMenu.values.length, (i) {
+                        return PopupMenuItem<String>(
+                          textStyle: getBoldTextStyle(color:ImageDropMenu.values[i]== ImageDropMenu.delete?AppColors.red:AppColors.black),
+                          onTap: (){
+                            if(ImageDropMenu.values[i]==ImageDropMenu.delete){
+
+                            }else if(ImageDropMenu.values[i] == ImageDropMenu.change){
+                              editingViewModel.pickGalleryImage(isChangeImage: true);
+                            }
+
+                          },
+                          child: Text(ImageDropMenu.values[i].getText()),
+                        );
+                      }),
+                      elevation: 8.0,
+                    );
+                  },
+                  child: ResizableWidget(
+                    isResizable:index == editingViewModel.selectedImageIndex,
+                    editingViewModel: editingViewModel,
+                    index: index,
+                    ballDiameter: context.width *0.05,
+                    child: Image.file(File(list[index].imageFile.path),fit: BoxFit.fill,),
+                  ),
                 );
 
               });
@@ -128,3 +148,16 @@ class _EditingSpace extends StatelessWidget {
   }
 }
 
+enum ImageDropMenu{
+  delete,
+  change,
+}
+
+extension menuActions on ImageDropMenu{
+  String getText(){
+    switch(this) {
+      case ImageDropMenu.delete: return "delete";
+      case ImageDropMenu.change: return "change";
+    }
+  }
+}
