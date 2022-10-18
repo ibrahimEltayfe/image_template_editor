@@ -9,6 +9,7 @@ import 'package:image_manipulate/core/utils/injector.dart' as di;
 import 'package:image_manipulate/presentation/editing_page/widgets/resizable_widget.dart';
 import 'package:image_manipulate/presentation/editing_page/view_model/editing_view_model.dart';
 import 'package:image_manipulate/presentation/reusable_components/app_bar.dart';
+import 'package:image_manipulate/presentation/reusable_components/pop_up_menu.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../widgets/bottom_toolbar.dart';
@@ -85,7 +86,8 @@ class _EditingPageState extends State<EditingPage> {
 class _EditingSpace extends StatelessWidget {
   final double height;
   final EditingViewModel editingViewModel;
-  const _EditingSpace({Key? key, required this.editingViewModel, required this.height}) : super(key: key);
+   _EditingSpace({Key? key, required this.editingViewModel, required this.height}) : super(key: key);
+  final containerKey = GlobalKey();
 
   @override
   Widget build(BuildContext context) {
@@ -107,37 +109,32 @@ class _EditingSpace extends StatelessWidget {
                   editingViewModel.imageList[index].height = height * 0.97;
                 }
                 //todo:show the menu on correct location,refactor
-                return GestureDetector(
-                  onLongPress: () async{
-                    await showMenu(
-                      context: context,
-                      position: const RelativeRect.fromLTRB(150, 300, 150, 150),
-                      items: List.generate(ImageDropMenu.values.length, (i) {
-                        return PopupMenuItem<String>(
-                          textStyle: getBoldTextStyle(color:ImageDropMenu.values[i]== ImageDropMenu.delete?AppColors.red:AppColors.black),
-                          onTap: (){
-                            if(ImageDropMenu.values[i]==ImageDropMenu.delete){
 
-                            }else if(ImageDropMenu.values[i] == ImageDropMenu.change){
-                              editingViewModel.pickGalleryImage(isChangeImage: true);
-                            }
-
-                          },
-                          child: Text(ImageDropMenu.values[i].getText()),
-                        );
-                      }),
-                      elevation: 8.0,
-                    );
-                  },
-                  child: ResizableWidget(
+                return ResizableWidget(
                     isResizable:index == editingViewModel.selectedImageIndex,
                     editingViewModel: editingViewModel,
                     index: index,
                     ballDiameter: context.width *0.05,
-                    child: Image.file(File(list[index].imageFile.path),fit: BoxFit.fill,),
-                  ),
-                );
+                    child: Builder(
+                      builder: (context) {
+                        return GestureDetector(
+                          onLongPress: () async{
+                            editingViewModel.changeSelectedImageIndex(index);
 
+                            await popUpMenu(context, (i){
+                              if(ImageDropMenu.values[i]==ImageDropMenu.delete){
+                                editingViewModel.deleteImage();
+                              }else if(ImageDropMenu.values[i] == ImageDropMenu.change){
+                                editingViewModel.pickGalleryImage(isChangeImage: true);
+                              }
+
+                            },);
+                          },
+                          child: Image.file(File(list[index].imageFile.path),fit: BoxFit.fill,)
+                        );
+                      }
+                    )
+                  );
               });
 
               return Stack(
@@ -145,19 +142,5 @@ class _EditingSpace extends StatelessWidget {
               );
             })
     );
-  }
-}
-
-enum ImageDropMenu{
-  delete,
-  change,
-}
-
-extension menuActions on ImageDropMenu{
-  String getText(){
-    switch(this) {
-      case ImageDropMenu.delete: return "delete";
-      case ImageDropMenu.change: return "change";
-    }
   }
 }

@@ -88,6 +88,15 @@ class EditingViewModel extends BaseViewModel with EditingInputViewModel,EditingO
     }
   }
 
+  void deleteImage(){
+    imageList.removeAt(selectedImageIndex);
+    selectedImageIndex = selectedImageIndex - 1;
+    if(selectedImageIndex < 0 && imageList.isNotEmpty){
+      selectedImageIndex++;
+    }
+    selectedImageInput.add(selectedImageIndex);
+  }
+
   void changeMainButtons(MainButtonsType type){
     if(type != mainButtonType){
       mainButtonType = type;
