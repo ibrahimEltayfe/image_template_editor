@@ -18,6 +18,8 @@ class AppStrings {
   static const String textColor = 'Text Color';
 
   static const String done = 'Done';
+  static const String cancel = 'Cancel';
+
   static const String delete = 'Delete';
   static const String save = 'Save';
 

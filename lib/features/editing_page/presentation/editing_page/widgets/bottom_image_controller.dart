@@ -4,12 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:image_manipulate/core/constants/app_colors.dart';
 import 'package:image_manipulate/core/constants/app_styles.dart';
 import 'package:image_manipulate/core/extensions/size_config.dart';
-import 'package:image_manipulate/presentation/editing_page/view_model/editing_view_model.dart';
 
-class BottomToolBar extends StatelessWidget {
+import '../../../domain/entities/image_model.dart';
+import '../view_model/editing_view_model.dart';
+
+class BottomControlBar extends StatelessWidget {
   final EditingViewModel editingViewModel;
   final double height;
-  const BottomToolBar({Key? key, required this.editingViewModel, required this.height,}) : super(key: key);
+  const BottomControlBar({Key? key, required this.editingViewModel, required this.height,}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -75,22 +77,18 @@ class _MainButtons extends StatelessWidget {
                             //todo add ontap
 
                           },
-                          child: LayoutBuilder(
-                            builder: (p0, p1) {
-                              return SizedBox(
-                                width: p1.maxWidth*0.6,
-                                height: p1.maxHeight*0.6,
-                                child: FittedBox(
-                                  child: Text(
-                                    mainButtons[i].title,
-                                    style:mainButtons[i].textStyle,
-                                    maxLines: 1,
-                                  ),
-                                ),
-                              );
-                            },
-
+                          child: FractionallySizedBox(
+                            widthFactor: 0.6,
+                            heightFactor: 0.6,
+                            child: FittedBox(
+                              child: Text(
+                                mainButtons[i].title,
+                                style:mainButtons[i].textStyle,
+                                maxLines: 1,
+                              ),
+                            ),
                           )
+
                       ),
                     ),
                   );}
@@ -148,7 +146,7 @@ class _ItemsControlSectionState extends State<_ItemsControlSection> {
                       children: [
                         Expanded(
                           child: ReorderableListView.builder(
-                            header: null,
+                             header: null,
                               onReorder: (oldIndex, newIndex) {
                                 if (newIndex > oldIndex) {
                                   newIndex -= 1;
@@ -157,13 +155,12 @@ class _ItemsControlSectionState extends State<_ItemsControlSection> {
                                 editingViewModel.imageList.insert(newIndex,item);
                                 editingViewModel.changeSelectedImageIndex(newIndex);
                               },
-                              onReorderEnd: (index) {
 
-                              },
                               scrollController: scrollController,
                               padding: EdgeInsets.symmetric(vertical:widget.height*0.09 ),
                               scrollDirection: Axis.horizontal,
                               itemCount: editingViewModel.imageList.length,
+
                               itemBuilder:(context, index) {
                                 return GestureDetector(
                                   key: ValueKey(editingViewModel.imageList[index]),

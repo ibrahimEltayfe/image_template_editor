@@ -4,15 +4,13 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_manipulate/core/constants/app_icons.dart';
 import 'package:image_manipulate/core/constants/app_strings.dart';
 import 'package:image_manipulate/core/extensions/size_config.dart';
-import 'package:image_manipulate/presentation/editing_page/view_model/editing_view_model.dart';
-import 'package:image_manipulate/presentation/reusable_components/fitted_icon.dart';
-import 'package:image_manipulate/presentation/reusable_components/fittted_text.dart';
-import '../../../core/constants/app_colors.dart';
+import '../../../../../core/constants/app_colors.dart';
+import '../view_model/editing_view_model.dart';
 
-class BuildEditingModeButtons extends StatelessWidget {
+class BuildEditingButtons extends StatelessWidget {
   final EditingViewModel editingViewModel;
   final double height;
-  const BuildEditingModeButtons({Key? key, required this.editingViewModel, required this.height}) : super(key: key);
+  const BuildEditingButtons({Key? key, required this.editingViewModel, required this.height}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -41,46 +39,38 @@ class _GetAttributesButtons extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
-      builder: (_, p1) => StreamBuilder(
+      builder: (_, constraints1) => StreamBuilder(
           stream:editingViewModel.attributeButtonsOutput,
           builder:(context, subButtonsList) {
-            final subButtons = subButtonsList.data;
-            if (subButtons == null) {
-              return const SizedBox.shrink();
-            }
+            final subButtons = editingViewModel.attributeButtons;
 
             return ListView.builder(
                 scrollDirection: Axis.horizontal,
                 itemCount: subButtons.length,
                 itemBuilder:(context, i){
                   return Padding(
-                    padding: EdgeInsets.symmetric(vertical: p1.maxHeight*0.075),
+                    padding: EdgeInsets.symmetric(vertical: constraints1.maxHeight*0.075),
                     child: SizedBox(
-                      width: p1.maxWidth*0.22,
+                      width: constraints1.maxWidth*0.22,
                       child: Column(
                         children: [
                           SizedBox(
-                            height: p1.maxHeight*0.53,
+                            height: constraints1.maxHeight*0.53,
                             child: ElevatedButton(
                                 style: subButtons[i].buttonStyle,
                                 onPressed:  (){
-                                  //todo add ontap
                                   editingViewModel.changeAttributeButtons(subButtons[i].type);
                                 },
-                                child:LayoutBuilder(
-                                    builder: (_,constraints) {
-                                      return SizedBox(
-                                        height: constraints.maxHeight*0.52,
-                                        width: constraints.maxWidth*0.52,
-                                        child: FittedBox(
-                                          child: Icon(
-                                              subButtons[i].icon,
-                                              color: subButtons[i].iconColor
-                                          ),
-                                        ),
-                                      );
-                                    }
-                                )
+                                child: FractionallySizedBox(
+                                    heightFactor:0.52,
+                                    widthFactor: 0.52,
+                                    child: FittedBox(
+                                      child: Icon(
+                                          subButtons[i].icon,
+                                          color: subButtons[i].iconColor
+                                      ),
+                                    ),
+                                  )
                             ),
                           ),
 

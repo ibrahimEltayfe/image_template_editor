@@ -1,13 +1,10 @@
-import 'dart:io';
-import 'dart:developer';
-
 import 'package:device_preview/device_preview.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_manipulate/core/constants/app_colors.dart';
-import 'package:image_manipulate/core/extensions/size_config.dart';
 import 'package:image_manipulate/core/utils/injector.dart' as di;
-import 'package:image_manipulate/presentation/home/view/home.dart';
+
+import 'features/home/home/view/home.dart';
 
 void main() {
   di.init();
@@ -30,7 +27,16 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         useInheritedMediaQuery: true,
         theme: ThemeData(
-          bottomSheetTheme:const BottomSheetThemeData(backgroundColor: AppColors.white),
+          bottomSheetTheme:const BottomSheetThemeData(
+              backgroundColor: AppColors.white,
+              elevation: 3,
+              shape: OutlineInputBorder(
+                borderSide: BorderSide.none,
+                borderRadius: BorderRadius.only(
+                  topRight: Radius.circular(15),
+                  topLeft: Radius.circular(15),
+            )
+          )),
         ),
         locale: DevicePreview.locale(context),
         builder: DevicePreview.appBuilder,

@@ -1,16 +1,22 @@
 import 'dart:async';
 import 'dart:developer';
+import 'dart:io';
 import 'dart:ui';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart' show ButtonStyle, Icons, TextStyle;
+import 'package:flutter/material.dart' show ButtonStyle, TextStyle;
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_manipulate/core/constants/app_colors.dart';
 import 'package:image_manipulate/core/constants/app_icons.dart';
 import 'package:image_manipulate/core/constants/app_strings.dart';
 import 'package:image_manipulate/core/constants/app_styles.dart';
-import 'package:image_manipulate/core/extensions/size_config.dart';
 import 'package:image_manipulate/core/utils/image_picker_helper.dart';
-import 'package:image_manipulate/presentation/base/base_view_model.dart';
+import 'package:image_manipulate/features/editing_page/domain/entities/remove_bg_value.dart';
+import 'package:image_manipulate/features/editing_page/presentation/base/base_view_model.dart';
 import 'package:image_picker/image_picker.dart';
+import '../../../domain/entities/attribute_button_model.dart';
+import '../../../domain/entities/image_model.dart';
+import '../../../domain/entities/main_button_model.dart';
+import 'package:flutter/foundation.dart';
 
 class EditingViewModel extends BaseViewModel with EditingInputViewModel,EditingOutputViewModel{
   final ImagePickerHelper imagePickerHelper;
@@ -19,16 +25,23 @@ class EditingViewModel extends BaseViewModel with EditingInputViewModel,EditingO
   MainButtonsType mainButtonType = MainButtonsType.image;
   AttributeButtonType? attributeButtonType;
   int selectedImageIndex = 0;
+  RemoveBGValues? removeBGValue;
+  Uint8List? noBackgroundImage;
 
   List<ImageModel> imageList = [];
+  List<AttributeButtonModel> attributeButtons = [];
 
   StreamController<List<MainButtonModel>> mainButtonController = StreamController();
-  StreamController<List<AttributeButtonModel>> attributeButtonController = StreamController();
+  StreamController<List<AttributeButtonModel>> attributeButtonController = StreamController.broadcast();
   StreamController<ImageModel> pickedImageController = StreamController();//todo:maybe remove this
   StreamController<int> selectedImageController = StreamController.broadcast();
+  StreamController<bool> showBottomSheetController = StreamController();
+  StreamController<RemoveBGValues> removeBGFeatherController = StreamController.broadcast();
 
   @override
   void start(XFile? image) {
+    showBottomSheetInput.add(false);
+
     final initialImageModel = ImageModel(
         imageFile: image!,
         width: 0,
@@ -42,8 +55,11 @@ class EditingViewModel extends BaseViewModel with EditingInputViewModel,EditingO
 
     mainButtonsInput.add(_getMainButtons(mainButtonType));
 
-    attributeButtonsInput.add(_getAttributeButtons());
+    attributeButtons = _getAttributeButtons();
+    attributeButtonsInput.add(attributeButtons);
+
     selectedImageInput.add(0);
+
   }
 
   @override
@@ -52,6 +68,8 @@ class EditingViewModel extends BaseViewModel with EditingInputViewModel,EditingO
     attributeButtonController.close();
     selectedImageController.close();
     pickedImageController.close();
+    showBottomSheetController.close();
+    removeBGFeatherController.close();
   }
 
   Future<void> pickGalleryImage({bool isChangeImage = false}) async{
@@ -88,6 +106,28 @@ class EditingViewModel extends BaseViewModel with EditingInputViewModel,EditingO
     }
   }
 
+  Future<void> saveImage() async{
+    //todo:refactor errros
+    final File? savedImage = await imagePickerHelper.saveImage(
+        noBackgroundImage!,
+        imageList[selectedImageIndex].imageFile.path
+    ).catchError((e,s){
+      log(e.toString());
+      Fluttertoast.showToast(msg: 'error, please try again');
+    });
+
+    if(savedImage == null){
+      Fluttertoast.showToast(msg: 'failed to save the image, please try again');
+    }else{
+      imageList.replaceRange(
+          selectedImageIndex,
+          selectedImageIndex+1,
+          [imageList[selectedImageIndex].copyWith(imageFile:XFile(savedImage.path))]
+      );
+    }
+    log(imageList[selectedImageIndex].imageFile.path.toString());
+  }
+
   void deleteImage(){
     imageList.removeAt(selectedImageIndex);
     selectedImageIndex = selectedImageIndex - 1;
@@ -102,23 +142,43 @@ class EditingViewModel extends BaseViewModel with EditingInputViewModel,EditingO
       mainButtonType = type;
       mainButtonsInput.add(_getMainButtons(type));
 
-      attributeButtonsInput.add(_getAttributeButtons());
+      attributeButtons = _getAttributeButtons();
+      attributeButtonsInput.add(attributeButtons);
     }
+  }
+
+  void changeBGRemoverFeather(int feather){
+    if(removeBGValue != null){
+      removeBGValue = removeBGValue!.copyWith(feather: feather);
+      removeBGFeatherInput.add(removeBGValue!);
+    }else{
+      removeBGFeatherController.addError("You should remove the background first to use feather");
+    }
+
+  }
+
+  void changeBGRemoverValues({required int red, required int green,required int blue,int? feather}){
+      removeBGValue = RemoveBGValues(red: red, green: green, blue: blue, feather: feather??0);
+      removeBGFeatherInput.add(removeBGValue!);
+  }
+
+  void changeBottomSheetState(bool isOpen){
+    showBottomSheetInput.add(isOpen);
   }
 
   void changeAttributeButtons(AttributeButtonType type){
     if(type != attributeButtonType){
-      attributeButtonsInput.add(_getAttributeButtons(type:type));
+      attributeButtons = _getAttributeButtons(type:type);
+      attributeButtonsInput.add(attributeButtons);
     }
   }
 
-  void changeSelectedImageIndex(index){
+  void changeSelectedImageIndex(int index){
     selectedImageIndex = index;
     selectedImageInput.add(index);
   }
 
   //private functions
-
   List<MainButtonModel> _getMainButtons(MainButtonsType type){
     TextStyle textStyle;
     ButtonStyle buttonStyle;
@@ -248,6 +308,12 @@ class EditingViewModel extends BaseViewModel with EditingInputViewModel,EditingO
   @override
   Sink<ImageModel> get pickedImageInput => pickedImageController.sink;
 
+  @override
+  Sink<bool> get showBottomSheetInput => showBottomSheetController.sink;
+
+  @override
+  Sink<RemoveBGValues> get removeBGFeatherInput => removeBGFeatherController.sink;
+
   //outputs
   @override
   Stream<List<MainButtonModel>> get mainButtonsOutput=> mainButtonController.stream;
@@ -260,6 +326,12 @@ class EditingViewModel extends BaseViewModel with EditingInputViewModel,EditingO
 
   @override
   Stream<ImageModel> get pickedImageOutput => pickedImageController.stream;
+
+  @override
+  Stream<bool> get showBottomSheetOutput => showBottomSheetController.stream;
+
+  @override
+  Stream<RemoveBGValues> get removeBGFeatherOutput => removeBGFeatherController.stream;
 }
 
 abstract class EditingInputViewModel{
@@ -267,6 +339,8 @@ abstract class EditingInputViewModel{
   Sink<List<AttributeButtonModel>> get attributeButtonsInput;
   Sink<int> get selectedImageInput;
   Sink<ImageModel> get pickedImageInput;
+  Sink<bool> get showBottomSheetInput;
+  Sink<RemoveBGValues> get removeBGFeatherInput;
 }
 
 abstract class EditingOutputViewModel{
@@ -274,92 +348,6 @@ abstract class EditingOutputViewModel{
   Stream<List<AttributeButtonModel>> get attributeButtonsOutput;
   Stream<int> get selectedImageOutput;
   Stream<ImageModel> get pickedImageOutput;
-}
-
-//models
-class MainButtonModel{
-  final String title;
-  final MainButtonsType type;
-  final ButtonStyle buttonStyle;
-  final TextStyle textStyle;
-
-  const MainButtonModel({
-    required this.textStyle,
-    required this.buttonStyle,
-    required this.title,
-    required this.type
-  });
-}
-
-class AttributeButtonModel{
-  final String title;
-  final IconData icon;
-  final TextStyle textStyle;
-  final ButtonStyle buttonStyle;
-  final Color iconColor;
-  final AttributeButtonType type;
-
-  AttributeButtonModel({
-    required this.type,
-    required this.icon,
-    required this.title,
-    required this.textStyle,
-    required this.buttonStyle,
-    required this.iconColor,
-  });
-}
-
-class AddSectionModel{
-  final List<String> titles;
-  AddSectionModel({
-    required this.titles,
-  });
-}
-
-class ImageModel{
-  XFile imageFile;
-  double width;
-  double height;
-  double top;
-  double left;
-
-  ImageModel({
-    required this.imageFile,
-    required this.width,
-    required this.height,
-    required this.top,
-    required this.left,
-  });
-
-  copyWith({
-    XFile? imageFile,
-    double? width,
-    double? height,
-    double? top,
-    double? left,
-  }){
-    return ImageModel(
-        left:left??this.left,
-        top: top??this.top,
-        height: height ?? this.height,
-        width: width??this.width,
-        imageFile: imageFile??this.imageFile
-    );
-  }
-}
-
-enum MainButtonsType{
-  image,text
-}
-
-enum AttributeButtonType{
-  textSize,
-  fontFamily,
-  fontWeight,
-  textColor,
-
-  resize,
-  crop,
-  blackAndWhite,
-  removeBg
+  Stream<bool> get showBottomSheetOutput;
+  Stream<RemoveBGValues> get removeBGFeatherOutput;
 }

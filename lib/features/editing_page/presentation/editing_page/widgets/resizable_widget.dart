@@ -1,19 +1,16 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:image_manipulate/presentation/editing_page/view_model/editing_view_model.dart';
+import '../view_model/editing_view_model.dart';
 
 class ResizableWidget extends StatefulWidget {
-  final Widget child;
   final double ballDiameter;
   final int index;
   final EditingViewModel editingViewModel;
-  final bool isResizable;
   const ResizableWidget({
     super.key,
     required this.index,
-    required this.child,
     required this.ballDiameter,
     required this.editingViewModel,
-    required this.isResizable
   });
 
   @override
@@ -28,12 +25,22 @@ class _ResizableWidgetState extends State<ResizableWidget> {
   late double ballDiameter;
 
   @override
+  void didUpdateWidget(ResizableWidget oldWidget) {
+    setState((){
+      height = widget.editingViewModel.imageList[widget.index].height;
+      width =  widget.editingViewModel.imageList[widget.index].width;
+      top = widget.editingViewModel.imageList[widget.index].top;
+      left = widget.editingViewModel.imageList[widget.index].left;
+    });
+    super.didUpdateWidget(oldWidget);
+  }
+
+  @override
   void initState() {
     height = widget.editingViewModel.imageList[widget.index].height;
     width =  widget.editingViewModel.imageList[widget.index].width;
     top = widget.editingViewModel.imageList[widget.index].top;
     left = widget.editingViewModel.imageList[widget.index].left;
-
     ballDiameter = widget.ballDiameter;
     super.initState();
   }
@@ -67,8 +74,7 @@ class _ResizableWidgetState extends State<ResizableWidget> {
   }
   @override
   Widget build(BuildContext context) {
-    return widget.isResizable
-      ? Stack(
+    return Stack(
       children: <Widget>[
         Positioned(
           top: top,
@@ -80,7 +86,10 @@ class _ResizableWidgetState extends State<ResizableWidget> {
             child: SizedBox(
               height: height,
               width: width,
-              child: widget.child,
+              child:Image.file(
+                  File(widget.editingViewModel.imageList[widget.index].imageFile.path),
+                  fit: BoxFit.fill
+              ),
             ),
           ),
         ),
@@ -257,28 +266,6 @@ class _ResizableWidgetState extends State<ResizableWidget> {
             },
           ),
         ),
-      ],
-    )
-      : Stack(
-      children: [
-        Positioned(
-            top: top,
-            left: left,
-            child: GestureDetector(
-                  onTap:(){
-                    widget.editingViewModel.changeSelectedImageIndex(widget.index);
-                  },
-
-              child: SizedBox(
-                width: width,
-                  height:height,
-                  child: FittedBox(
-                      fit: BoxFit.fill,
-                      child: widget.child
-                  )
-              ),
-            )
-        )
       ],
     );
   }

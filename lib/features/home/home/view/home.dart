@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -6,9 +5,8 @@ import 'package:image_manipulate/core/constants/app_colors.dart';
 import 'package:image_manipulate/core/constants/app_strings.dart';
 import 'package:image_manipulate/core/constants/app_styles.dart';
 import 'package:image_manipulate/core/extensions/size_config.dart';
-import 'package:image_manipulate/core/utils/image_picker_helper.dart';
 import 'package:image_manipulate/core/utils/injector.dart' as di;
-import '../../editing_page/view/editing_view.dart';
+import 'package:image_manipulate/features/editing_page/presentation/editing_page/view/editing_view.dart';
 import '../view_model/home_viewmodel.dart';
 
 class Home extends StatefulWidget {

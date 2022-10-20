@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:image_manipulate/core/constants/app_styles.dart';
 import 'package:image_manipulate/core/extensions/size_config.dart';
-import 'package:image_manipulate/presentation/editing_page/view_model/editing_view_model.dart';
-
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_icons.dart';
+import '../editing_page/presentation/editing_page/view_model/editing_view_model.dart';
 import 'fitted_icon.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget{
